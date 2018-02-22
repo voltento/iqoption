@@ -12,6 +12,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <utility>
 #include <tuple>
+#include <set>
 
 #include "RawCmdDataProvider.h"
 #include "UserBid.h"
@@ -31,20 +32,29 @@ private:
 
     void ConnectUser(User::Id userId);
     void DisconnectUser(User::Id userId);
-    void RegistrateUser(User::Id userId, std::string&& name);
+    void RegisterateUser(User::Id userId, std::string &&name);
     void UserDealWon(User::Id userId, const std::string& time, const std::string& amount);
+
+    void UpdateUserSorted(const User& user);
 
     /// Parses raw command.
     std::tuple<Command, User::Id, std::list<std::string>> ParseCommand(const std::string& rawCommand);
+
+    struct UserSorter{
+        bool operator()(const User *u1, const User *u2) { return u1->wonAmount < u2->wonAmount; }
+    };
 private:
     DataProvider* dataProvider;
 
     std::unordered_map<User::Id, User> users;
     std::unordered_set<User::Id> connectedUsers;
 
-    std::atomic_bool isStopped;
+    std::set<const User*, UserSorter> userSortedAmount;
 
     mutable std::mutex usersMutex;
+
+    std::atomic_bool isStopped;
+
 
     static constexpr char SPLITER = '\t';
 };

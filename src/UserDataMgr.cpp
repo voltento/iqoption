@@ -47,7 +47,7 @@ void UserDataMgr::FillFromDataProvider() {
                 }
                 break;
                 case Command::REGISTRED: {
-                    RegistrateUser(std::get<1>(cmdArg), std::move(*std::get<2>(cmdArg).begin()));
+                    RegisterateUser(std::get<1>(cmdArg), std::move(*std::get<2>(cmdArg).begin()));
                 }
                 break;
                 case Command::INVALID:
@@ -146,14 +146,23 @@ void UserDataMgr::DisconnectUser(User::Id userId) {
     connectedUsers.insert(userId);
 }
 
-void UserDataMgr::RegistrateUser(User::Id userId, std::string &&name) {
+void UserDataMgr::RegisterateUser(User::Id userId, std::string &&name) {
     std::lock_guard<std::mutex> guard(usersMutex);
     auto it = users.find(userId);
     if (it != users.end()) {
         std::cerr << "Try register for already registered user. UserId: '" << userId << "'" << std::endl;
         return;
     }
+    bool pointersInvalid = users.load_factor()*users.bucket_count() == users.size();
     users[userId] = User{userId, std::move(name)};
+    if(pointersInvalid) {
+        userSortedAmount.clear();
+        std::for_each(users.begin(), users.end(), [&](const std::pair<User::Id, User>& val){
+            userSortedAmount.insert(&val.second);
+        });
+    } else {
+        UpdateUserSorted(it->second);
+    }
 }
 
 void UserDataMgr::UserDealWon(User::Id userId, const std::string &time, const std::string &amountRaw) {
@@ -174,9 +183,19 @@ void UserDataMgr::UserDealWon(User::Id userId, const std::string &time, const st
     }
 
     it->second.wonAmount += amount;
-    // TODO: resort data!
+    UpdateUserSorted(it->second);
 }
 
 void UserDataMgr::Stop() {
     isStopped.store(true);
+}
+
+void UserDataMgr::UpdateUserSorted(const User &user) {
+    auto userSortedIt = userSortedAmount.find(&user);
+    if(userSortedIt != userSortedAmount.end()) {
+        auto removeIterator = userSortedIt;
+        userSortedIt = std::next(removeIterator);
+        userSortedAmount.erase(removeIterator);
+    }
+    userSortedAmount.insert(userSortedIt, &user);
 }
