@@ -5,32 +5,43 @@
 #ifndef RECIVER_DATAPROVIDER_H
 #define RECIVER_DATAPROVIDER_H
 
-#include <boost/lockfree/queue.hpp>
 #include <mutex>
 #include <chrono>
 #include <cstdio>
+#include <string>
+#include <queue>
+#include <atomic>
+#include <fstream>
+#include <condition_variable>
+#include <thread>
 
 /// Message data provider. Might work in separate thread.
 class DataProvider {
 public:
     /// \idlexcept std::runtime_error
     explicit DataProvider(const char* sourceFile);
+    ~DataProvider();
 
     bool Next(std::string& out);
 
-    void WaitNewData() const;
+    /// Waits while data will be added to empty queue.
+    /// \return False if new data will not be provided more, other false
+    bool WaitNoEmpty() const;
 
-    template <class _Rep, class _Period>
-    bool WaitNewDataFor(const std::chrono::duration<_Rep, _Period>& time) { return mtx.try_lock_for(time); }
-
-    void SetMsgBufferCount(std::uint32_t newSize);
-
+    void StartAsynchRead();
 private:
-    boost::lockfree::queue<std::string> rawQueries;
-    mutable std::timed_mutex mtx;
+    bool Read(std::string& out);
+private:
+    std::ifstream source;
+    std::queue<std::string> rawQueries;
 
-    std::FILE* source;
-    std::uint32_t msgBuferCount = 10000;
+    mutable std::mutex queueMutex;
+    mutable std::condition_variable newDataAdded;
+    mutable std::condition_variable halfQueueFree;
+
+    std::unique_ptr<std::thread> readThread;
+
+    static constexpr size_t MAX_QUEUE_SIZE = 1000;
 };
 
 

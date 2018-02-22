@@ -1,0 +1,4 @@
+user_registered id name
+user_deal_won id time amount
+user_connected id
+user_disconnected id
