@@ -11,25 +11,53 @@ UserDataMgr::UserDataMgr(DataProvider *dataProvider) : dataProvider(dataProvider
 }
 
 void UserDataMgr::Start() {
+    isStopped.store(false);
     dataProvider->StartAsynchRead();
+    FillFromDataProvider();
 }
 
 
 void UserDataMgr::FillFromDataProvider() {
     std::string rawCommand;
     while (true) {
+        if(isStopped.load())
+            return;
+
         if (!dataProvider->Next(rawCommand)) {
             if (!dataProvider->WaitNoEmpty())
                 break;
         } else {
             std::tuple<Command, User::Id, std::list<std::string>> cmdArg = ParseCommand(rawCommand);
+            switch (std::get<0>(cmdArg)) {
+                case Command::CONNECTED: {
+                    ConnectUser(std::get<1>(cmdArg));
+                }
+                break;
+                case Command::DISCONNECTED: {
+                    DisconnectUser(std::get<1>(cmdArg));
+                }
+                break;
+                case Command::DEAL_WON: {
+                    const std::string &timeRaw = *std::get<2>(cmdArg).begin();
+                    const std::string &amount = *std::next(std::get<2>(cmdArg).begin());
+                    UserDealWon(std::get<1>(cmdArg), timeRaw, amount);
+                }
+                break;
+                case Command::REGISTRED: {
+                    RegistrateUser(std::get<1>(cmdArg), std::move(*std::get<2>(cmdArg).begin()));
+                }
+                break;
+                case Command::INVALID:
+                break;
+            }
         }
     }
 }
 
-std::tuple<UserDataMgr::Command, User::Id, std::list<std::string>> UserDataMgr::ParseCommand(const std::string &rawCommand) {
+std::tuple<UserDataMgr::Command, User::Id, std::list<std::string>>
+UserDataMgr::ParseCommand(const std::string &rawCommand) {
     std::list<std::string> args;
-    boost::algorithm::split(args, rawCommand, [](char v){return SPLITER == v;});
+    boost::algorithm::split(args, rawCommand, [](char v) { return SPLITER == v; });
     Command command = Command::INVALID;
     if (args.size() < 2) {
         std::cerr << "Can't parse command: '" << rawCommand << "'" << std::endl;
@@ -49,7 +77,7 @@ std::tuple<UserDataMgr::Command, User::Id, std::list<std::string>> UserDataMgr::
     try {
         userId = std::stoll(args.front());
     }
-    catch (const std::invalid_argument& ex) {
+    catch (const std::invalid_argument &ex) {
         std::cerr << "Can't parse use id from : '" << args.front() << "'. Reason: '" << ex.what() << "'" << std::endl;
         return std::make_tuple(command, 0, args);
     }
@@ -61,12 +89,12 @@ std::tuple<UserDataMgr::Command, User::Id, std::list<std::string>> UserDataMgr::
         else
             command = Command::REGISTRED;
     } else if (commandNameRaw == "user_connected") {
-        if (args.empty())
+        if (!args.empty())
             LogCantParseCommand(0, args.size());
         else
             command = Command::CONNECTED;
     } else if (commandNameRaw == "user_disconnected") {
-        if (args.empty())
+        if (!args.empty())
             LogCantParseCommand(0, args.size());
         else
             command = Command::DISCONNECTED;
@@ -84,19 +112,24 @@ void UserDataMgr::ProcCommand(const std::pair<UserDataMgr::Command, std::list<st
     switch (cmdArgs.first) {
         case Command::DISCONNECTED : {
 
-        } break;
-        case Command::REGISTRED:{
+        }
+            break;
+        case Command::REGISTRED: {
 
-        } break;
-        case Command::CONNECTED:{
+        }
+            break;
+        case Command::CONNECTED: {
 
-        } break;
-        case Command::DEAL_WON:{
+        }
+            break;
+        case Command::DEAL_WON: {
 
-        } break;
-        case Command::INVALID:{
+        }
+            break;
+        case Command::INVALID: {
 
-        } break;
+        }
+            break;
     }
 }
 
@@ -113,7 +146,7 @@ void UserDataMgr::DisconnectUser(User::Id userId) {
 void UserDataMgr::RegistrateUser(User::Id userId, std::string &&name) {
     std::lock_guard<std::mutex> guard(usersMutex);
     auto it = users.find(userId);
-    if(it != users.end()) {
+    if (it != users.end()) {
         std::cerr << "Try register for already registered user. UserId: '" << userId << "'" << std::endl;
         return;
     }
@@ -123,7 +156,7 @@ void UserDataMgr::RegistrateUser(User::Id userId, std::string &&name) {
 void UserDataMgr::UserDealWon(User::Id userId, const std::string &time, const std::string &amountRaw) {
     std::lock_guard<std::mutex> guard(usersMutex);
     auto it = users.find(userId);
-    if(it == users.end()) {
+    if (it == users.end()) {
         std::cerr << "Can't find user. UserId: '" << userId << "'" << std::endl;
         return;
     }
@@ -132,11 +165,15 @@ void UserDataMgr::UserDealWon(User::Id userId, const std::string &time, const st
     try {
         amount = std::stoll(amountRaw);
     }
-    catch (const std::invalid_argument& ex) {
+    catch (const std::invalid_argument &ex) {
         std::cerr << "Can't parse use id from : '" << amountRaw << "'. Reason: '" << ex.what() << "'" << std::endl;
-        return ;
+        return;
     }
 
     it->second.wonAmount += amount;
     // TODO: resort data!
+}
+
+void UserDataMgr::Stop() {
+    isStopped.store(true);
 }

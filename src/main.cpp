@@ -11,11 +11,14 @@
 
 std::unique_ptr<TCPServer> server;
 std::unique_ptr<boost::asio::io_service> io_service;
+std::unique_ptr<UserDataMgr> dataMgr;
 
 void HandleIntSig(int signal) {
     std::cout << "Handle SigInt" << std::endl;
     server.reset();
     io_service->stop();
+    if(dataMgr)
+        dataMgr->Stop();
 }
 
 int main(int argc, char** argv) {
@@ -63,15 +66,16 @@ int main(int argc, char** argv) {
         period = std::chrono::seconds(resultRef["period"].as<int>());
     }
 
-
     io_service = std::make_unique<boost::asio::io_service>();
     DataProvider dataProvider(source.c_str());
-    UserDataMgr storage(&dataProvider);
-    server = std::make_unique<TCPServer>(*io_service, static_cast<unsigned short>(port), &storage, period);
+    dataMgr = std::make_unique<UserDataMgr>(&dataProvider);
+    std::thread dataMgrThread([&](){dataMgr->Start();});
+
+    server = std::make_unique<TCPServer>(*io_service, static_cast<unsigned short>(port), dataMgr.get(), period);
 
     std::cout << "Start listening on port: '" << port << "'" << std::endl;
     io_service->run();
-
+    dataMgrThread.join();
     std::cout << "Finished." << std::endl;
     return 0;
 }

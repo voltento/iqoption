@@ -1,4 +1,6 @@
-user_registered id name
-user_deal_won id time amount
-user_connected id
-user_disconnected id
+user_deal_won	1	12301924123	0.1
+user_registered	1	foo
+user_connected	1
+user_connected	2
+user_disconnected	1
+user_deal_won	1	12301924123	0.1

@@ -21,7 +21,7 @@ class UserDataMgr {
 public:
     explicit UserDataMgr(DataProvider* dataProvider);
     void Start();
-
+    void Stop();
 private:
     void FillFromDataProvider();
 
@@ -41,6 +41,8 @@ private:
 
     std::unordered_map<User::Id, User> users;
     std::unordered_set<User::Id> connectedUsers;
+
+    std::atomic_bool isStopped;
 
     mutable std::mutex usersMutex;
 
