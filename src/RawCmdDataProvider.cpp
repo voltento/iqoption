@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include <cstring>
-#include "DataProvider.h"
+#include "RawCmdDataProvider.h"
 
 DataProvider::DataProvider(const char *sourceFile) {
     if(sourceFile == nullptr)

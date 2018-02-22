@@ -11,19 +11,22 @@
 #include <utility>
 #include <boost/asio.hpp>
 
-using boost::asio::ip::tcp;
+#include "UserDataMgr.h"
+
 
 class Session
 {
 public:
-    explicit Session(tcp::socket socket);
+    explicit Session(boost::asio::ip::tcp::socket socket, UserDataMgr* session, std::chrono::milliseconds sendPeriod);
     void start();
     ~Session();
 private:
     void doWrite();
 private:
-    tcp::socket socket;
+    boost::asio::ip::tcp::socket socket;
     std::string data;
+    UserDataMgr* storage;
+    std::chrono::milliseconds sendPeriod;
 };
 
 

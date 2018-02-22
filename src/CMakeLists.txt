@@ -4,10 +4,10 @@ set(CMAKE_CXX_STANDARD 14)
 
 add_executable(reciver
         main.cpp
-        DataProvider.cpp DataProvider.h
+        RawCmdDataProvider.cpp RawCmdDataProvider.h
         TCPServer.cpp TCPServer.h
         Session.cpp Session.h
-        Storage.cpp Storage.h)
+        UserDataMgr.cpp UserDataMgr.h UserBid.cpp UserBid.h)
 
 find_package(Boost COMPONENTS system REQUIRED)
 

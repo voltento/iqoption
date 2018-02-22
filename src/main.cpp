@@ -4,8 +4,8 @@
 
 #include "cxxopts.hpp"
 
-#include "DataProvider.h"
-#include "Storage.h"
+#include "RawCmdDataProvider.h"
+#include "UserDataMgr.h"
 #include "TCPServer.h"
 
 
@@ -63,15 +63,15 @@ int main(int argc, char** argv) {
         period = std::chrono::seconds(resultRef["period"].as<int>());
     }
 
+
     io_service = std::make_unique<boost::asio::io_service>();
     DataProvider dataProvider(source.c_str());
-    Storage storage(&dataProvider);
-    server = std::make_unique<TCPServer>(*io_service.get(), static_cast<unsigned short>(port), &storage);
-    std::cout << "Start listening on port: '" << port << "'" << std::endl;
+    UserDataMgr storage(&dataProvider);
+    server = std::make_unique<TCPServer>(*io_service, static_cast<unsigned short>(port), &storage, period);
 
+    std::cout << "Start listening on port: '" << port << "'" << std::endl;
     io_service->run();
 
     std::cout << "Finished." << std::endl;
-
     return 0;
 }
