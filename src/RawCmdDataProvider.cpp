@@ -27,11 +27,14 @@ void DataProvider::StartAsynchRead() {
         [&](){
             std::string newData;
             while(Read(newData)) {
-                if(MAX_QUEUE_SIZE >= rawQueries.size()) {
+                {
                     std::unique_lock<std::mutex> guard(queueMutex);
-                    halfQueueFree.wait(guard, [&](){ return rawQueries.size() <= MAX_QUEUE_SIZE/2; });
+                    if (MAX_QUEUE_SIZE >= rawQueries.size()) {
+                        halfQueueFree.wait(guard, [&]() { return rawQueries.size() <= MAX_QUEUE_SIZE / 2; });
+                    }
                 }
-                std::unique_lock<std::mutex> lockGuard(queueMutex);
+
+                std::unique_lock<std::mutex> guard(queueMutex);
                 rawQueries.push(std::move(newData));
                 if(rawQueries.size() == 1)
                     newDataAdded.notify_one();
@@ -42,10 +45,8 @@ void DataProvider::StartAsynchRead() {
 
 bool DataProvider::Next(std::string &out) {
     std::unique_lock<std::mutex> lockGuard(queueMutex);
-
     if(rawQueries.empty())
         return false;
-
     out = rawQueries.front();
     rawQueries.pop();
 
@@ -63,8 +64,10 @@ bool DataProvider::Read(std::string &out) {
     return false;
 }
 
-bool DataProvider::WaitNoEmpty() const {
+bool DataProvider::WaitNoEmpty(const std::chrono::milliseconds& timeout) const {
     std::unique_lock<std::mutex> guard(queueMutex);
-    newDataAdded.wait(guard, [&](){ return !rawQueries.empty();});
+    if(!rawQueries.empty())
+        return true;
+    newDataAdded.wait_for(guard, timeout, [&](){ return !rawQueries.empty();});
     return false;
 }

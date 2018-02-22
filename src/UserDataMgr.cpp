@@ -24,8 +24,11 @@ void UserDataMgr::FillFromDataProvider() {
             return;
 
         if (!dataProvider->Next(rawCommand)) {
-            if (!dataProvider->WaitNoEmpty())
-                break;
+            static constexpr std::chrono::milliseconds timeout(10);
+            while(!dataProvider->WaitNoEmpty(timeout)) {
+                if(isStopped.load())
+                    return;
+            }
         } else {
             std::tuple<Command, User::Id, std::list<std::string>> cmdArg = ParseCommand(rawCommand);
             switch (std::get<0>(cmdArg)) {

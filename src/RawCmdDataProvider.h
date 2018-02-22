@@ -26,7 +26,7 @@ public:
 
     /// Waits while data will be added to empty queue.
     /// \return False if new data will not be provided more, other false
-    bool WaitNoEmpty() const;
+    bool WaitNoEmpty(const std::chrono::milliseconds& timeout) const;
 
     void StartAsynchRead();
 private:
