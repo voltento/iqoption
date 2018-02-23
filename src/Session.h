@@ -26,17 +26,21 @@ public:
     bool IsAlive() const { return isAlive.load(); }
 
 private:
-    void doWrite();
-
+    void Stop();
+    void StartWriteStat(const boost::system::error_code& error, std::size_t bytesTransffered);
+    void DoWrite();
+    bool BuildStat(std::string& out);
 private:
     const boost::posix_time::seconds sendPeriod;
     boost::asio::ip::tcp::socket socket;
-    std::string data;
-    UserDataMgr *storage;
+    UserDataMgr *storage = nullptr;
     boost::asio::io_service& io_service;
     boost::asio::deadline_timer timer;
 
     std::atomic_bool isAlive;
+    static constexpr size_t idSize = 8;
+    User::Id userId = 0;
+    char readBuffer[idSize];
 };
 
 

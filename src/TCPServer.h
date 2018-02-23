@@ -37,12 +37,12 @@ private:
     std::list<std::unique_ptr<Session>> sessions;
 
     boost::asio::deadline_timer clearSessionTimer;
-    boost::posix_time::seconds clearSessionPeriod = boost::posix_time::seconds(3);
+    boost::posix_time::seconds clearSessionPeriod = boost::posix_time::seconds(10);
 
     boost::asio::io_service &io_service;
     tcp::acceptor acceptor;
     tcp::socket socket;
-    UserDataMgr *storage;
+    UserDataMgr *storage = nullptr;
     size_t sendPeriodSeconds = 60;
 };
 

@@ -19,29 +19,59 @@ Session::Session(tcp::socket socket, UserDataMgr *storage, size_t sendSeconds,
         isAlive(true)
 {}
 
-void Session::doWrite() {
-    std::this_thread::get_id();
-    std::stringstream ss;
-    ss << std::this_thread::get_id();
-    ss >> data;
+void Session::DoWrite() {
+    std::string data;
+    if(!BuildStat(data)) {
+        Stop();
+        return;
+    }
+
     try {
         socket.write_some(boost::asio::buffer(data.c_str(), data.size()));
     }
     catch (const boost::system::system_error& ex) {
         std::cerr << "Write socket exception occured: '" << ex.what() << std::endl;
-        isAlive.store(false);
+        Stop();
         return;
     }
     timer.expires_from_now(sendPeriod);
-    timer.async_wait(boost::bind(&Session::doWrite, this));
+    timer.async_wait(boost::bind(&Session::DoWrite, this));
 }
 
 void Session::start() {
-    doWrite();
+    boost::asio::async_read(socket,
+                            boost::asio::buffer(readBuffer, sizeof(readBuffer)),
+                            boost::bind(&Session::StartWriteStat, this, _1, _2));
 }
 
 Session::~Session() {
     timer.cancel();
     socket.close();
     std::cout << "Session closed" << std::endl;
+}
+
+void Session::StartWriteStat(const boost::system::error_code& error, std::size_t bytesTransffered) {
+    if (!error && bytesTransffered == idSize)
+    {
+        try {
+            userId = *reinterpret_cast<User::Id*>(readBuffer);
+        }
+        catch (const std::exception& ex) {
+            std::cerr << "Parse id exception. Raw id: '" <<  std::string(readBuffer, idSize) << "'" << std::endl;
+        }
+        DoWrite();
+    }
+    else {
+        std::cerr << "Read from socket end with error: '" << error << "'" << std::endl;
+        Stop();
+    }
+}
+
+void Session::Stop() {
+    isAlive.store(false);
+}
+
+bool Session::BuildStat(std::string & data) {
+    data = " You id: " + std::to_string(userId);
+    return true;
 }
