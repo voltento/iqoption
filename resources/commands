@@ -1,8 +1,20 @@
-user_deal_won	1	12301924123	0.1
-user_registered	1	foo
+user_registered	1	user1
+user_registered	7	user7
+user_registered	3	user3
+user_registered	5	user5
+user_registered	6	user6
+user_registered	4	user4
+user_registered	2	user2
+user_registered	8	user8
+user_registered	9	user9
+user_registered	10	user10
+user_registered	11	user11
 user_connected	1
 user_connected	2
 user_disconnected	1
+user_deal_won	2	12301924123	0.2
 user_deal_won	1	12301924123	0.1
-user_deal_won	1	12301924123	0.1
-user_deal_won	1	12301924123	0.1
+user_deal_won	4	12301924123	0.4
+user_deal_won	3	12301924123	0.3
+user_deal_won	5	12301924123	0.5
+

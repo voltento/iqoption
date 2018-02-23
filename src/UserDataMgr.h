@@ -43,7 +43,14 @@ private:
     std::tuple<Command, User::Id, std::list<std::string>> ParseCommand(const std::string& rawCommand);
 
     struct UserSorter{
-        bool operator()(const User *u1, const User *u2) { return u1->wonAmount < u2->wonAmount; }
+        bool operator()(const User *u1, const User *u2)
+        {
+            static constexpr double delta = 0.000001;
+            if(std::abs(u1->wonAmount - u2->wonAmount) < delta)
+                return u1->id > u2->id;
+
+            return u1->wonAmount > u2->wonAmount;
+        }
     };
 
 private:

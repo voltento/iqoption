@@ -102,15 +102,16 @@ void UserDataMgr::RegisterateUser(User::Id userId, std::string &&name) {
         return;
     }
     bool pointersInvalid = users.load_factor() * users.bucket_count() == users.size();
-    users[userId] = std::make_unique<User>(userId, std::move(name));
+    auto newUserSPtr = std::make_unique<User>(userId, std::move(name));
+    auto* newUserPtr = newUserSPtr.get();
+    users[userId] = std::move(newUserSPtr);
     if (!users.empty() && pointersInvalid) {
         userSortedAmount.clear();
         for(const auto& user : users) {
-            std::cerr << "Debug: reorder pointer:" << user.second.get() << std::endl;
             userSortedAmount.insert(user.second.get());
         }
     } else {
-        UpdateUserSorted(it->second.get());
+        UpdateUserSorted(newUserPtr);
     }
 }
 
@@ -124,7 +125,7 @@ void UserDataMgr::UserDealWon(User::Id userId, const std::string &time, const st
 
     double amount = 0;
     try {
-        amount = std::stoll(amountRaw);
+        amount = std::stod(amountRaw);
     }
     catch (const std::invalid_argument &ex) {
         std::cerr << "Can't parse use id from : '" << amountRaw << "'. Reason: '" << ex.what() << "'" << std::endl;
@@ -146,9 +147,8 @@ void UserDataMgr::UpdateUserSorted(const User *user) {
         userSortedIt = std::next(removeIterator);
         userSortedAmount.erase(removeIterator);
     }
-    std::cerr << "Debug: update user sorted pointer: " << user << std::endl;
 
-    userSortedAmount.insert(userSortedIt, user);
+    userSortedAmount.insert(user);
 }
 
 bool UserDataMgr::DoesUserExist(User::Id userId) const {
@@ -163,7 +163,7 @@ bool UserDataMgr::BuildStat(User::Id userId, std::string &data) {
         return false;
 
     for (auto &stat : BuildNStats(0, NUM_STAT_POSITION_PRINT))
-        data.append(std::move(stat));
+        data.append(stat);
 
     return true;
 }
@@ -172,11 +172,11 @@ std::vector<std::string> UserDataMgr::BuildNStats(const size_t startInd, const s
     size_t counter = 0;
     std::vector<std::string> results;
     results.reserve(num);
-    for (auto it = std::next(userSortedAmount.begin(), startInd);
+    for (auto it = userSortedAmount.begin();
          it != userSortedAmount.end() && counter < num;
          ++it, ++counter
             ) {
-        std::string newResult = "Position: " + std::to_string(counter) + " ";
+        std::string newResult = "Position: " + std::to_string(counter+1) + " ";
         newResult += User::to_string(**it);
         newResult.push_back('\n');
         results.emplace_back(std::move(newResult));
