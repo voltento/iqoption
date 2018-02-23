@@ -44,7 +44,7 @@ public:
 
 private:
     /// Use this method only under mutex
-    std::vector<std::string> BuildNStats(std::set<const User *, UserSorter>::iterator it, size_t itInd, const size_t num);
+    std::vector<std::string> BuildNStats(std::set<const User *, UserSorter>::iterator it, size_t position, const size_t num);
 
     std::vector<std::string> BuildNAroundUser(User* id, const size_t num);
 
@@ -71,8 +71,8 @@ private:
     std::atomic_bool isStopped;
 
 
-    static constexpr char SPLITER = '\t';
-    static constexpr size_t NUM_STAT_POSITION_PRINT = 10;
+    static constexpr char SPLITER = ' ';
+    static constexpr size_t NUM_STAT_POSITION_PRINT = 5;
 };
 
 

@@ -1,19 +1,200 @@
-user_registered	1	user1
-user_registered	7	user7
-user_registered	3	user3
-user_registered	5	user5
-user_registered	6	user6
-user_registered	4	user4
-user_registered	2	user2
-user_registered	8	user8
-user_registered	9	user9
-user_registered	10	user10
-user_registered	11	user11
-user_connected	1
-user_connected	2
-user_disconnected	1
-user_deal_won	2	12301924123	0.2
-user_deal_won	1	12301924123	0.1
-user_deal_won	4	12301924123	0.4
-user_deal_won	3	12301924123	0.3
-user_deal_won	5	12301924123	0.5
+user_registered 0 user0
+user_registered 1 user1
+user_registered 2 user2
+user_registered 3 user3
+user_registered 4 user4
+user_registered 5 user5
+user_registered 6 user6
+user_registered 7 user7
+user_registered 8 user8
+user_registered 9 user9
+user_registered 10 user10
+user_registered 11 user11
+user_registered 12 user12
+user_registered 13 user13
+user_registered 14 user14
+user_registered 15 user15
+user_registered 16 user16
+user_registered 17 user17
+user_registered 18 user18
+user_registered 19 user19
+user_registered 20 user20
+user_registered 21 user21
+user_registered 22 user22
+user_registered 23 user23
+user_registered 24 user24
+user_registered 25 user25
+user_registered 26 user26
+user_registered 27 user27
+user_registered 28 user28
+user_registered 29 user29
+user_registered 30 user30
+user_registered 31 user31
+user_registered 32 user32
+user_registered 33 user33
+user_registered 34 user34
+user_registered 35 user35
+user_registered 36 user36
+user_registered 37 user37
+user_registered 38 user38
+user_registered 39 user39
+user_registered 40 user40
+user_registered 41 user41
+user_registered 42 user42
+user_registered 43 user43
+user_registered 44 user44
+user_registered 45 user45
+user_registered 46 user46
+user_registered 47 user47
+user_registered 48 user48
+user_registered 49 user49
+user_registered 50 user50
+user_registered 51 user51
+user_registered 52 user52
+user_registered 53 user53
+user_registered 54 user54
+user_registered 55 user55
+user_registered 56 user56
+user_registered 57 user57
+user_registered 58 user58
+user_registered 59 user59
+user_registered 60 user60
+user_registered 61 user61
+user_registered 62 user62
+user_registered 63 user63
+user_registered 64 user64
+user_registered 65 user65
+user_registered 66 user66
+user_registered 67 user67
+user_registered 68 user68
+user_registered 69 user69
+user_registered 70 user70
+user_registered 71 user71
+user_registered 72 user72
+user_registered 73 user73
+user_registered 74 user74
+user_registered 75 user75
+user_registered 76 user76
+user_registered 77 user77
+user_registered 78 user78
+user_registered 79 user79
+user_registered 80 user80
+user_registered 81 user81
+user_registered 82 user82
+user_registered 83 user83
+user_registered 84 user84
+user_registered 85 user85
+user_registered 86 user86
+user_registered 87 user87
+user_registered 88 user88
+user_registered 89 user89
+user_registered 90 user90
+user_registered 91 user91
+user_registered 92 user92
+user_registered 93 user93
+user_registered 94 user94
+user_registered 95 user95
+user_registered 96 user96
+user_registered 97 user97
+user_registered 98 user98
+user_registered 99 user99
+user_deal_won 0 10804.754772858 100
+user_deal_won 1 10804.754782549 99
+user_deal_won 2 10804.754786422 98
+user_deal_won 3 10804.75478923 97
+user_deal_won 4 10804.754792112 96
+user_deal_won 5 10804.754794826 95
+user_deal_won 6 10804.754797493 94
+user_deal_won 7 10804.754800153 93
+user_deal_won 8 10804.754802961 92
+user_deal_won 9 10804.754805612 91
+user_deal_won 10 10804.754808374 90
+user_deal_won 11 10804.754811169 89
+user_deal_won 12 10804.754813867 88
+user_deal_won 13 10804.754816581 87
+user_deal_won 14 10804.7548192 86
+user_deal_won 15 10804.754821844 85
+user_deal_won 16 10804.754824511 84
+user_deal_won 17 10804.754827245 83
+user_deal_won 18 10804.754830029 82
+user_deal_won 19 10804.754832718 81
+user_deal_won 20 10804.754835428 80
+user_deal_won 21 10804.754838195 79
+user_deal_won 22 10804.754840867 78
+user_deal_won 23 10804.754843619 77
+user_deal_won 24 10804.75484626 76
+user_deal_won 25 10804.754848918 75
+user_deal_won 26 10804.754851593 74
+user_deal_won 27 10804.754854255 73
+user_deal_won 28 10804.754856958 72
+user_deal_won 29 10804.754859628 71
+user_deal_won 30 10804.754862313 70
+user_deal_won 31 10804.754864993 69
+user_deal_won 32 10804.754867707 68
+user_deal_won 33 10804.754870442 67
+user_deal_won 34 10804.754873148 66
+user_deal_won 35 10804.754875922 65
+user_deal_won 36 10804.754878593 64
+user_deal_won 37 10804.754881283 63
+user_deal_won 38 10804.754883987 62
+user_deal_won 39 10804.754886814 61
+user_deal_won 40 10804.754889594 60
+user_deal_won 41 10804.754892258 59
+user_deal_won 42 10804.754894963 58
+user_deal_won 43 10804.754897721 57
+user_deal_won 44 10804.754900409 56
+user_deal_won 45 10804.75490313 55
+user_deal_won 46 10804.754905864 54
+user_deal_won 47 10804.7549086 53
+user_deal_won 48 10804.754911185 52
+user_deal_won 49 10804.754913891 51
+user_deal_won 50 10804.75491667 50
+user_deal_won 51 10804.754919406 49
+user_deal_won 52 10804.754922124 48
+user_deal_won 53 10804.754924801 47
+user_deal_won 54 10804.754927571 46
+user_deal_won 55 10804.754930257 45
+user_deal_won 56 10804.75493296 44
+user_deal_won 57 10804.75493571 43
+user_deal_won 58 10804.754938415 42
+user_deal_won 59 10804.754941105 41
+user_deal_won 60 10804.754943851 40
+user_deal_won 61 10804.754946544 39
+user_deal_won 62 10804.754949262 38
+user_deal_won 63 10804.754951925 37
+user_deal_won 64 10804.754954657 36
+user_deal_won 65 10804.754957323 35
+user_deal_won 66 10804.754960016 34
+user_deal_won 67 10804.754962736 33
+user_deal_won 68 10804.754965428 32
+user_deal_won 69 10804.754968103 31
+user_deal_won 70 10804.754970875 30
+user_deal_won 71 10804.754973591 29
+user_deal_won 72 10804.75497629 28
+user_deal_won 73 10804.754978978 27
+user_deal_won 74 10804.754981629 26
+user_deal_won 75 10804.754984327 25
+user_deal_won 76 10804.754987018 24
+user_deal_won 77 10804.754989728 23
+user_deal_won 78 10804.75499252 22
+user_deal_won 79 10804.754995297 21
+user_deal_won 80 10804.754997983 20
+user_deal_won 81 10804.755000725 19
+user_deal_won 82 10804.755003551 18
+user_deal_won 83 10804.755006387 17
+user_deal_won 84 10804.755009084 16
+user_deal_won 85 10804.75501176 15
+user_deal_won 86 10804.755014459 14
+user_deal_won 87 10804.755017119 13
+user_deal_won 88 10804.755019802 12
+user_deal_won 89 10804.75502246 11
+user_deal_won 90 10804.755025117 10
+user_deal_won 91 10804.755027785 9
+user_deal_won 92 10804.755030543 8
+user_deal_won 93 10804.755033242 7
+user_deal_won 94 10804.755035898 6
+user_deal_won 95 10804.755038593 5
+user_deal_won 96 10804.755041243 4
+user_deal_won 97 10804.755043864 3
+user_deal_won 98 10804.755046546 2
+user_deal_won 99 10804.755049221 1

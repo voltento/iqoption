@@ -162,20 +162,25 @@ bool UserDataMgr::BuildStat(User::Id userId, std::string &data) {
     if (it == users.end())
         return false;
 
+    data.append("Top:\n");
     for (auto &stat : BuildNStats(userSortedAmount.begin(), 0, NUM_STAT_POSITION_PRINT))
+        data.append(stat);
+    data.append("\n");
+
+    for(auto &stat: BuildNAroundUser(it->second.get(), NUM_STAT_POSITION_PRINT))
         data.append(stat);
 
     return true;
 }
 
-std::vector<std::string> UserDataMgr::BuildNStats(std::set<const User*, UserSorter>::iterator it, size_t itInd, const size_t num) {
+std::vector<std::string> UserDataMgr::BuildNStats(std::set<const User*, UserSorter>::iterator it, size_t position, const size_t num) {
     std::vector<std::string> results;
     results.reserve(num);
     for (size_t counter = 0;
          it != userSortedAmount.end() && counter < num;
          ++it, ++counter
             ) {
-        std::string newResult = "Position: " + std::to_string(counter+itInd) + " ";
+        std::string newResult = "Position: " + std::to_string(counter+position) + " ";
         newResult += User::to_string(**it);
         newResult.push_back('\n');
         results.emplace_back(std::move(newResult));
@@ -188,5 +193,8 @@ std::vector<std::string> UserDataMgr::BuildNAroundUser(User* user, const size_t 
     if(it == userSortedAmount.end())
         return {};
 
-    return std::vector<std::string>();
+    size_t ind = static_cast<size_t>(std::distance(userSortedAmount.begin(), it));
+    size_t startStatPos = (ind > num ? ind - num : 0);
+    std::advance(it, ind - startStatPos);
+    return BuildNStats(it, startStatPos, num+ind+1);
 }
