@@ -11,7 +11,7 @@ TCPServer::TCPServer(boost::asio::io_service &io_service, unsigned short port, U
         : acceptor(io_service, tcp::endpoint(tcp::v4(), port)),
           socket(io_service),
           storage(storage), sendPeriodSeconds(sendPeriod), io_service(io_service),
-          clearSessionTimer(io_service) {
+          clearSessionTimer(io_service, clearSessionPeriod) {
     if (storage == nullptr)
         throw std::runtime_error("Nullptr was sent as storage'");
 
@@ -53,6 +53,6 @@ void TCPServer::clearSessions() {
                              });
     sessions.erase(it, sessions.end());
     std::cerr << "Clear sessions..." << std::endl;
-    clearSessionTimer.async_wait(boost::bind(&TCPServer::clearSessionTimer, this));
-    clearSessionTimer.expires_at(clearSessionTimer.expires_at() + clearSessionPeriod);
+    clearSessionTimer.expires_from_now(clearSessionPeriod);
+    clearSessionTimer.async_wait(boost::bind(&TCPServer::clearSessions, this));
 }

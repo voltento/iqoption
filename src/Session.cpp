@@ -15,7 +15,7 @@ Session::Session(tcp::socket socket, UserDataMgr *storage, size_t sendSeconds,
         storage(storage),
         sendPeriod(boost::posix_time::seconds(sendSeconds)),
         io_service(io_service),
-        timer(io_service, sendPeriod),
+        timer(io_service),
         isAlive(true)
 {}
 
@@ -32,7 +32,7 @@ void Session::doWrite() {
         isAlive.store(false);
         return;
     }
-    timer.expires_at(timer.expires_at() + sendPeriod);
+    timer.expires_from_now(sendPeriod);
     timer.async_wait(boost::bind(&Session::doWrite, this));
 }
 

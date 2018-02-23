@@ -37,7 +37,7 @@ private:
     std::list<std::unique_ptr<Session>> sessions;
 
     boost::asio::deadline_timer clearSessionTimer;
-    boost::posix_time::seconds clearSessionPeriod = boost::posix_time::seconds(1);
+    boost::posix_time::seconds clearSessionPeriod = boost::posix_time::seconds(3);
 
     boost::asio::io_service &io_service;
     tcp::acceptor acceptor;
