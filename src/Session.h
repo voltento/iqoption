@@ -19,7 +19,7 @@ public:
     explicit Session(boost::asio::ip::tcp::socket socket, UserDataMgr *session,
                      size_t sendTimeOut, boost::asio::io_service& io_service);
 
-    void start();
+    void Start();
 
     ~Session();
 

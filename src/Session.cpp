@@ -38,7 +38,7 @@ void Session::DoWrite() {
     timer.async_wait(boost::bind(&Session::DoWrite, this));
 }
 
-void Session::start() {
+void Session::Start() {
     boost::asio::async_read(socket,
                             boost::asio::buffer(readBuffer, sizeof(readBuffer)),
                             boost::bind(&Session::StartWriteStat, this, _1, _2));
@@ -72,6 +72,8 @@ void Session::StartWriteStat(const boost::system::error_code& error, std::size_t
 }
 
 void Session::Stop() {
+    if(isAlive.load())
+        return;
     timer.cancel();
     socket.close();
     std::cout << "Session closed. User id: '" << userId << "'" << std::endl;
