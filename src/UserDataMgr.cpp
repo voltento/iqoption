@@ -162,24 +162,31 @@ bool UserDataMgr::BuildStat(User::Id userId, std::string &data) {
     if (it == users.end())
         return false;
 
-    for (auto &stat : BuildNStats(0, NUM_STAT_POSITION_PRINT))
+    for (auto &stat : BuildNStats(userSortedAmount.begin(), 0, NUM_STAT_POSITION_PRINT))
         data.append(stat);
 
     return true;
 }
 
-std::vector<std::string> UserDataMgr::BuildNStats(const size_t startInd, const size_t num) {
-    size_t counter = 0;
+std::vector<std::string> UserDataMgr::BuildNStats(std::set<const User*, UserSorter>::iterator it, size_t itInd, const size_t num) {
     std::vector<std::string> results;
     results.reserve(num);
-    for (auto it = userSortedAmount.begin();
+    for (size_t counter = 0;
          it != userSortedAmount.end() && counter < num;
          ++it, ++counter
             ) {
-        std::string newResult = "Position: " + std::to_string(counter+1) + " ";
+        std::string newResult = "Position: " + std::to_string(counter+itInd) + " ";
         newResult += User::to_string(**it);
         newResult.push_back('\n');
         results.emplace_back(std::move(newResult));
     }
     return results;
+}
+
+std::vector<std::string> UserDataMgr::BuildNAroundUser(User* user, const size_t num) {
+    auto it = std::find(userSortedAmount.begin(), userSortedAmount.end(), user);
+    if(it == userSortedAmount.end())
+        return {};
+
+    return std::vector<std::string>();
 }
