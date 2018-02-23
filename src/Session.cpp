@@ -45,9 +45,7 @@ void Session::start() {
 }
 
 Session::~Session() {
-    timer.cancel();
-    socket.close();
-    std::cout << "Session closed" << std::endl;
+    Stop();
 }
 
 void Session::StartWriteStat(const boost::system::error_code& error, std::size_t bytesTransffered) {
@@ -59,7 +57,13 @@ void Session::StartWriteStat(const boost::system::error_code& error, std::size_t
         catch (const std::exception& ex) {
             std::cerr << "Parse id exception. Raw id: '" <<  std::string(readBuffer, idSize) << "'" << std::endl;
         }
-        DoWrite();
+        if(storage->DoesUserExist(userId)) {
+            DoWrite();
+        }
+        else {
+            std::cerr << "Unrigestred user try to connect. User id: '" << userId << "'" << std::endl;
+            Stop();
+        }
     }
     else {
         std::cerr << "Read from socket end with error: '" << error << "'" << std::endl;
@@ -68,6 +72,9 @@ void Session::StartWriteStat(const boost::system::error_code& error, std::size_t
 }
 
 void Session::Stop() {
+    timer.cancel();
+    socket.close();
+    std::cout << "Session closed. User id: '" << userId << "'" << std::endl;
     isAlive.store(false);
 }
 

@@ -32,13 +32,6 @@ void UserDataMgr::FillFromDataProvider() {
         } else {
             std::tuple<Command, User::Id, std::list<std::string>> cmdArg = ParseCommand(rawCommand);
             switch (std::get<0>(cmdArg)) {
-                case Command::CONNECTED: {
-                    ConnectUser(std::get<1>(cmdArg));
-                }
-                break;
-                case Command::DISCONNECTED: {
-                    DisconnectUser(std::get<1>(cmdArg));
-                }
                 break;
                 case Command::DEAL_WON: {
                     const std::string &timeRaw = *std::get<2>(cmdArg).begin();
@@ -91,16 +84,6 @@ UserDataMgr::ParseCommand(const std::string &rawCommand) {
             LogCantParseCommand(1, args.size());
         else
             command = Command::REGISTRED;
-    } else if (commandNameRaw == "user_connected") {
-        if (!args.empty())
-            LogCantParseCommand(0, args.size());
-        else
-            command = Command::CONNECTED;
-    } else if (commandNameRaw == "user_disconnected") {
-        if (!args.empty())
-            LogCantParseCommand(0, args.size());
-        else
-            command = Command::DISCONNECTED;
     } else if (commandNameRaw == "user_deal_won") {
         if (args.size() != 2)
             LogCantParseCommand(2, args.size());
@@ -109,41 +92,6 @@ UserDataMgr::ParseCommand(const std::string &rawCommand) {
     }
 
     return std::make_tuple(command, userId, args);
-}
-
-void UserDataMgr::ProcCommand(const std::pair<UserDataMgr::Command, std::list<std::string>> &cmdArgs) {
-    switch (cmdArgs.first) {
-        case Command::DISCONNECTED : {
-
-        }
-            break;
-        case Command::REGISTRED: {
-
-        }
-            break;
-        case Command::CONNECTED: {
-
-        }
-            break;
-        case Command::DEAL_WON: {
-
-        }
-            break;
-        case Command::INVALID: {
-
-        }
-            break;
-    }
-}
-
-void UserDataMgr::ConnectUser(User::Id userId) {
-    std::lock_guard<std::mutex> guard(usersMutex);
-    connectedUsers.erase(userId);
-}
-
-void UserDataMgr::DisconnectUser(User::Id userId) {
-    std::lock_guard<std::mutex> guard(usersMutex);
-    connectedUsers.insert(userId);
 }
 
 void UserDataMgr::RegisterateUser(User::Id userId, std::string &&name) {
@@ -198,4 +146,9 @@ void UserDataMgr::UpdateUserSorted(const User &user) {
         userSortedAmount.erase(removeIterator);
     }
     userSortedAmount.insert(userSortedIt, &user);
+}
+
+bool UserDataMgr::DoesUserExist(User::Id userId) const {
+    std::lock_guard<std::mutex> guard(usersMutex);
+    return users.find(userId) != users.end();
 }
