@@ -23,7 +23,7 @@ public:
     /// Start tcp server
     /// \idlexcept runtime_error
     TCPServer(boost::asio::io_service &io_service, unsigned short port, UserDataMgr *storage,
-              std::chrono::milliseconds sendPeriod);
+              size_t sendPeriod);
 
     ~TCPServer();
 
@@ -31,11 +31,19 @@ public:
 
 private:
     void doAccept();
+    void clearSessions();
 
+    std::mutex sessionsMutex;
+    std::list<std::unique_ptr<Session>> sessions;
+
+    boost::asio::deadline_timer clearSessionTimer;
+    boost::posix_time::seconds clearSessionPeriod = boost::posix_time::seconds(1);
+
+    boost::asio::io_service &io_service;
     tcp::acceptor acceptor;
     tcp::socket socket;
     UserDataMgr *storage;
-    std::chrono::milliseconds sendPeriod = std::chrono::milliseconds(60);
+    size_t sendPeriodSeconds = 60;
 };
 
 

@@ -14,19 +14,29 @@
 #include "UserDataMgr.h"
 
 
-class Session
-{
+class Session {
 public:
-    explicit Session(boost::asio::ip::tcp::socket socket, UserDataMgr* session, std::chrono::milliseconds sendPeriod);
+    explicit Session(boost::asio::ip::tcp::socket socket, UserDataMgr *session,
+                     size_t sendTimeOut, boost::asio::io_service& io_service);
+
     void start();
+
     ~Session();
+
+    bool IsAlive() const { return isAlive.load(); }
+
 private:
     void doWrite();
+
 private:
+    const boost::posix_time::seconds sendPeriod;
     boost::asio::ip::tcp::socket socket;
     std::string data;
-    UserDataMgr* storage;
-    std::chrono::milliseconds sendPeriod;
+    UserDataMgr *storage;
+    boost::asio::io_service& io_service;
+    boost::asio::deadline_timer timer;
+
+    std::atomic_bool isAlive;
 };
 
 
