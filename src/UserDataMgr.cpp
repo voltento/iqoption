@@ -20,13 +20,13 @@ void UserDataMgr::Start() {
 void UserDataMgr::FillFromDataProvider() {
     std::string rawCommand;
     while (true) {
-        if(isStopped.load())
+        if (isStopped.load())
             return;
 
         if (!dataProvider->Next(rawCommand)) {
             static constexpr std::chrono::milliseconds timeout(10);
-            while(!dataProvider->WaitNoEmpty(timeout)) {
-                if(isStopped.load())
+            while (!dataProvider->WaitNoEmpty(timeout)) {
+                if (isStopped.load())
                     return;
             }
         } else {
@@ -38,13 +38,13 @@ void UserDataMgr::FillFromDataProvider() {
                     const std::string &amount = *std::next(std::get<2>(cmdArg).begin());
                     UserDealWon(std::get<1>(cmdArg), timeRaw, amount);
                 }
-                break;
+                    break;
                 case Command::REGISTRED: {
                     RegisterateUser(std::get<1>(cmdArg), std::move(*std::get<2>(cmdArg).begin()));
                 }
-                break;
+                    break;
                 case Command::INVALID:
-                break;
+                    break;
             }
         }
     }
@@ -101,11 +101,11 @@ void UserDataMgr::RegisterateUser(User::Id userId, std::string &&name) {
         std::cerr << "Try register for already registered user. UserId: '" << userId << "'" << std::endl;
         return;
     }
-    bool pointersInvalid = users.load_factor()*users.bucket_count() == users.size();
+    bool pointersInvalid = users.load_factor() * users.bucket_count() == users.size();
     users[userId] = User{userId, std::move(name)};
-    if(pointersInvalid) {
+    if (!users.empty() && pointersInvalid) {
         userSortedAmount.clear();
-        std::for_each(users.begin(), users.end(), [&](const std::pair<User::Id, User>& val){
+        std::for_each(users.begin(), users.end(), [&](const std::pair<User::Id, User> &val) {
             userSortedAmount.insert(&val.second);
         });
     } else {
@@ -140,7 +140,7 @@ void UserDataMgr::Stop() {
 
 void UserDataMgr::UpdateUserSorted(const User &user) {
     auto userSortedIt = userSortedAmount.find(&user);
-    if(userSortedIt != userSortedAmount.end()) {
+    if (userSortedIt != userSortedAmount.end()) {
         auto removeIterator = userSortedIt;
         userSortedIt = std::next(removeIterator);
         userSortedAmount.erase(removeIterator);
@@ -151,4 +151,35 @@ void UserDataMgr::UpdateUserSorted(const User &user) {
 bool UserDataMgr::DoesUserExist(User::Id userId) const {
     std::lock_guard<std::mutex> guard(usersMutex);
     return users.find(userId) != users.end();
+}
+
+bool UserDataMgr::BuildStat(User::Id userId, std::string &data) {
+    std::lock_guard<std::mutex> guard(usersMutex);
+    auto it = users.find(userId);
+    if (it == users.end())
+        return false;
+
+    for (auto &stat : BuildNStats(0, NUM_STAT_POSITION_PRINT)) {
+        data.append(std::move(stat));
+        data.append("\n");
+    }
+
+    return true;
+}
+
+std::vector<std::string> UserDataMgr::BuildNStats(const size_t startInd, const size_t num) {
+    size_t counter = 0;
+    std::vector<std::string> results;
+    results.reserve(num);
+    for (auto it = std::next(userSortedAmount.begin(), startInd);
+         it != userSortedAmount.end() && counter < num;
+         ++it, ++counter
+        )
+    {
+        std::string newResult = "Position: " + std::to_string(counter) + " ";
+        newResult += User::to_string(**it);
+        newResult.push_back('\n');
+        results.emplace_back(std::move(newResult));
+    }
+    return results;
 }

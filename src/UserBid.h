@@ -7,6 +7,7 @@
 
 #include <string>
 #include <chrono>
+#include <sstream>
 
 
 struct User {
@@ -14,7 +15,10 @@ struct User {
     Id id = 0;
     std::string name;
     double wonAmount = 0;
+    static std::string to_string(const User &user);
 };
+
+
 
 
 struct Bid {

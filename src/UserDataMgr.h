@@ -25,7 +25,12 @@ public:
     void Stop();
 
     bool DoesUserExist(User::Id userId) const;
+
+    bool BuildStat(User::Id userId, std::string & data);
 private:
+    /// Use this method only under mutex
+    std::vector<std::string> BuildNStats(const size_t startInd, const size_t num);
+
     void FillFromDataProvider();
 
     void RegisterateUser(User::Id userId, std::string &&name);
@@ -40,6 +45,7 @@ private:
     struct UserSorter{
         bool operator()(const User *u1, const User *u2) { return u1->wonAmount < u2->wonAmount; }
     };
+
 private:
     DataProvider* dataProvider;
 
@@ -53,6 +59,7 @@ private:
 
 
     static constexpr char SPLITER = '\t';
+    static constexpr size_t NUM_STAT_POSITION_PRINT = 10;
 };
 
 

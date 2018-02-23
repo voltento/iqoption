@@ -12,7 +12,7 @@ using namespace boost::asio::ip;
 Session::Session(tcp::socket socket, UserDataMgr *storage, size_t sendSeconds,
                  boost::asio::io_service &io_service) :
         socket(std::move(socket)),
-        storage(storage),
+        dataMgr(storage),
         sendPeriod(boost::posix_time::seconds(sendSeconds)),
         io_service(io_service),
         timer(io_service),
@@ -57,7 +57,7 @@ void Session::StartWriteStat(const boost::system::error_code& error, std::size_t
         catch (const std::exception& ex) {
             std::cerr << "Parse id exception. Raw id: '" <<  std::string(readBuffer, idSize) << "'" << std::endl;
         }
-        if(storage->DoesUserExist(userId)) {
+        if(dataMgr->DoesUserExist(userId)) {
             DoWrite();
         }
         else {
@@ -79,6 +79,5 @@ void Session::Stop() {
 }
 
 bool Session::BuildStat(std::string & data) {
-    data = " You id: " + std::to_string(userId);
-    return true;
+    return dataMgr->BuildStat(userId, data);
 }
