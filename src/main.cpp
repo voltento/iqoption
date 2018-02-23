@@ -16,9 +16,9 @@ std::unique_ptr<UserDataMgr> dataMgr;
 void HandleIntSig(int signal) {
     std::cout << "Handle SigInt" << std::endl;
     server.reset();
-    io_service->stop();
     if (dataMgr)
         dataMgr->Stop();
+    io_service->stop();
 }
 
 int main(int argc, char **argv) {
@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
     } else {
         port = resultRef["port"].as<int>();
     }
-
+    
     size_t sendPeriod = 60;
     if (resultRef.count("period") > 0) {
         sendPeriod = resultRef["period"].as<size_t>();
@@ -76,8 +76,13 @@ int main(int argc, char **argv) {
                                          sendPeriod);
 
     std::cout << "Start listening on port: '" << port << "'" << std::endl;
-    io_service->run();
-    dataMgrThread.join();
+    std::vector<std::thread> threadPool;
+    for(int i = 0; i < 10; ++i)
+        threadPool.emplace_back([&](){io_service->run();});
+    for(auto& t : threadPool)
+        t.join();
+    if(dataMgrThread.joinable())
+        dataMgrThread.join();
     std::cout << "Finished." << std::endl;
     return 0;
 }
