@@ -196,5 +196,5 @@ std::vector<std::string> UserDataMgr::BuildNAroundUser(User* user, const size_t 
     size_t ind = static_cast<size_t>(std::distance(userSortedAmount.begin(), it));
     size_t startStatPos = (ind > num ? ind - num : 0);
     std::advance(it, ind - startStatPos);
-    return BuildNStats(it, startStatPos, num+ind+1);
+    return BuildNStats(it, startStatPos, num*2+1);
 }
