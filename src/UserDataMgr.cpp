@@ -102,14 +102,15 @@ void UserDataMgr::RegisterateUser(User::Id userId, std::string &&name) {
         return;
     }
     bool pointersInvalid = users.load_factor() * users.bucket_count() == users.size();
-    users[userId] = User{userId, std::move(name)};
+    users[userId] = std::make_unique<User>(userId, std::move(name));
     if (!users.empty() && pointersInvalid) {
         userSortedAmount.clear();
-        std::for_each(users.begin(), users.end(), [&](const std::pair<User::Id, User> &val) {
-            userSortedAmount.insert(&val.second);
-        });
+        for(const auto& user : users) {
+            std::cerr << "Debug: reorder pointer:" << user.second.get() << std::endl;
+            userSortedAmount.insert(user.second.get());
+        }
     } else {
-        UpdateUserSorted(it->second);
+        UpdateUserSorted(it->second.get());
     }
 }
 
@@ -130,22 +131,24 @@ void UserDataMgr::UserDealWon(User::Id userId, const std::string &time, const st
         return;
     }
 
-    it->second.wonAmount += amount;
-    UpdateUserSorted(it->second);
+    it->second->wonAmount += amount;
+    UpdateUserSorted(it->second.get());
 }
 
 void UserDataMgr::Stop() {
     isStopped.store(true);
 }
 
-void UserDataMgr::UpdateUserSorted(const User &user) {
-    auto userSortedIt = userSortedAmount.find(&user);
+void UserDataMgr::UpdateUserSorted(const User *user) {
+    auto userSortedIt = userSortedAmount.find(user);
     if (userSortedIt != userSortedAmount.end()) {
         auto removeIterator = userSortedIt;
         userSortedIt = std::next(removeIterator);
         userSortedAmount.erase(removeIterator);
     }
-    userSortedAmount.insert(userSortedIt, &user);
+    std::cerr << "Debug: update user sorted pointer: " << user << std::endl;
+
+    userSortedAmount.insert(userSortedIt, user);
 }
 
 bool UserDataMgr::DoesUserExist(User::Id userId) const {
@@ -159,10 +162,8 @@ bool UserDataMgr::BuildStat(User::Id userId, std::string &data) {
     if (it == users.end())
         return false;
 
-    for (auto &stat : BuildNStats(0, NUM_STAT_POSITION_PRINT)) {
+    for (auto &stat : BuildNStats(0, NUM_STAT_POSITION_PRINT))
         data.append(std::move(stat));
-        data.append("\n");
-    }
 
     return true;
 }
@@ -174,8 +175,7 @@ std::vector<std::string> UserDataMgr::BuildNStats(const size_t startInd, const s
     for (auto it = std::next(userSortedAmount.begin(), startInd);
          it != userSortedAmount.end() && counter < num;
          ++it, ++counter
-        )
-    {
+            ) {
         std::string newResult = "Position: " + std::to_string(counter) + " ";
         newResult += User::to_string(**it);
         newResult.push_back('\n');

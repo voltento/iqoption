@@ -12,6 +12,8 @@
 
 struct User {
     using Id = long long;
+    User(Id id, std::string name, double wonAmount = 0) :
+    id(id), name(name), wonAmount(wonAmount) { }
     Id id = 0;
     std::string name;
     double wonAmount = 0;

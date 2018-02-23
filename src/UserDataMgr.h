@@ -37,7 +37,7 @@ private:
 
     void UserDealWon(User::Id userId, const std::string& time, const std::string& amount);
 
-    void UpdateUserSorted(const User& user);
+    void UpdateUserSorted(const User* user);
 
     /// Parses raw command.
     std::tuple<Command, User::Id, std::list<std::string>> ParseCommand(const std::string& rawCommand);
@@ -49,7 +49,7 @@ private:
 private:
     DataProvider* dataProvider;
 
-    std::unordered_map<User::Id, User> users;
+    std::unordered_map<User::Id, std::unique_ptr<User>> users;
 
     std::set<const User*, UserSorter> userSortedAmount;
 
