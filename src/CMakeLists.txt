@@ -7,7 +7,7 @@ add_executable(reciver
         RawCmdDataProvider.cpp RawCmdDataProvider.h
         TCPServer.cpp TCPServer.h
         Session.cpp Session.h
-        UserDataMgr.cpp UserDataMgr.h UserBid.cpp UserBid.h)
+        UserDataMgr.cpp UserDataMgr.h UserBid.cpp UserBid.h Utils.h Utils.cpp)
 
 find_package(Boost COMPONENTS system REQUIRED)
 

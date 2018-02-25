@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
     } else {
         port = resultRef["port"].as<int>();
     }
-    
+
     size_t sendPeriod = 60;
     if (resultRef.count("period") > 0) {
         sendPeriod = resultRef["period"].as<size_t>();
@@ -67,7 +67,7 @@ int main(int argc, char **argv) {
 
     io_service = std::make_unique<boost::asio::io_service>();
     DataProvider dataProvider(source.c_str());
-    dataMgr = std::make_unique<UserDataMgr>(&dataProvider);
+    dataMgr = std::make_unique<UserDataMgr>(&dataProvider, *io_service);
     std::thread dataMgrThread([&]() { dataMgr->Start(); });
 
     server = std::make_unique<TCPServer>(*io_service,
