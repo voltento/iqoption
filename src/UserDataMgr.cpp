@@ -192,14 +192,13 @@ bool UserDataMgr::BuildStat(User::Id userId, std::string &data) {
     if (it == users.end())
         return false;
 
-    data.append("Top:\n");
     for (auto &stat : BuildNStats(userSortedAmount.begin(), 0, NUM_STAT_POSITION_PRINT))
         data.append(stat);
     data.append("\n");
 
     for (auto &stat: BuildNAroundUser(it->second.get(), NUM_STAT_POSITION_PRINT))
         data.append(stat);
-
+    data.append("\n");
     return true;
 }
 
