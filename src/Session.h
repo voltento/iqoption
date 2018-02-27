@@ -30,6 +30,7 @@ private:
     void StartWriteStat(const boost::system::error_code& error, std::size_t bytesTransffered);
     void DoWrite();
     bool BuildStat(std::string& out);
+    void WriteHandler(const boost::system::error_code& ec, std::size_t bytes_transferred);
 private:
     const boost::posix_time::seconds sendPeriod;
     boost::asio::ip::tcp::socket socket;
@@ -41,6 +42,7 @@ private:
     static constexpr size_t idSize = 8;
     User::Id userId = 0;
     char readBuffer[idSize];
+    std::string writeBuffer;
 };
 
 

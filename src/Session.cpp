@@ -20,14 +20,14 @@ Session::Session(tcp::socket socket, UserDataMgr *storage, size_t sendSeconds,
 {}
 
 void Session::DoWrite() {
-    std::string data;
-    if(!BuildStat(data)) {
+    if(!BuildStat(writeBuffer)) {
         Stop();
         return;
     }
 
     try {
-        socket.write_some(boost::asio::buffer(data.c_str(), data.size()));
+        socket.async_write_some(boost::asio::buffer(writeBuffer.c_str(), writeBuffer.size()),
+                                boost::bind(&Session::WriteHandler, this, _1, _2));
     }
     catch (const boost::system::system_error& ex) {
         std::cerr << "Write socket exception occured: '" << ex.what() << std::endl;
@@ -82,4 +82,9 @@ void Session::Stop() {
 
 bool Session::BuildStat(std::string & data) {
     return dataMgr->BuildStat(userId, data);
+}
+
+void Session::WriteHandler(const boost::system::error_code &ec, std::size_t bytes_transferred) {
+    std::cerr << "Send error occured: '" << ec.message() << "'" << std::endl;
+    Stop();
 }
