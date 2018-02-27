@@ -19,5 +19,5 @@ while True:
         s.close()
         break
     else:
-        print(buffer.decode('utf8'))
+        print(buffer.decode('utf8'), end='')
 print("Finished")
