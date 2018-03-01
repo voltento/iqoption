@@ -106,18 +106,10 @@ void UserDataMgr::RegisterateUser(User::Id userId, std::string &&name) {
         std::cerr << "Try register for already registered user. UserId: '" << userId << "'" << std::endl;
         return;
     }
-    bool pointersInvalid = users.load_factor() * users.bucket_count() == users.size();
     auto newUserSPtr = std::make_unique<User>(userId, std::move(name));
     auto *newUserPtr = newUserSPtr.get();
     users[userId] = std::move(newUserSPtr);
-    if (!users.empty() && pointersInvalid) {
-        userSortedAmount.clear();
-        for (const auto &user : users) {
-            userSortedAmount.insert(user.second.get());
-        }
-    } else {
-        UpdateUserSorted(newUserPtr);
-    }
+    UpdateUserSorted(newUserPtr);
 }
 
 void UserDataMgr::UserDealWon(User::Id userId, const std::string &time, const std::string &amountRaw) {
